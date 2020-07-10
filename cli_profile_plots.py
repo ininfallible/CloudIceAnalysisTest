@@ -1,24 +1,21 @@
 import matplotlib as mpl
 from netCDF4 import Dataset
-import ncdump
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import cartopy.crs as ccrs
 import numpy as np
 
+import ncdump
+import adjustfont
+
 # def colors
-# TODO: auto-determine bounds
 norm = mpl.colors.Normalize(vmin=1e-6, vmax=6e-5)
 cmap = mpl.cm.rainbow
 
-def gen_levels(lo, hi, n):
-    out = []
-    cur = lo
-    for i in range(n):
-        out.append(cur)
-        cur += (hi-lo)/n
-    return out
+adjustfont.adjfont()
 
+fig = plt.figure()
+fig.suptitle("CLI Profile")
 
 def plot_cli_profile(dataset, splt_param, title):
     # get data from netcdf file
@@ -38,7 +35,8 @@ def plot_cli_profile(dataset, splt_param, title):
     # calc mean for lons 
     for i in range(plev.size):
         cli_profile.append(np.mean(cli[i]))
-    ax.plot(plev, cli_profile, marker='o')
+    plt.gca().invert_yaxis()
+    ax.plot(cli_profile, plev, marker='o')
     
 
 nc3 = Dataset("GFDL_am3_cli_2009_01.nc", "r", format="NETCDF3_CLASSIC")
@@ -46,7 +44,9 @@ nc4 = Dataset("GFDL_am4_cli_2009_01.nc", "r", format="NETCDF3_CLASSIC")
 ncdump.ncdump(nc3)
 ncdump.ncdump(nc4)
 
-plot_cli_profile(nc3, 211, "AM3 CLI profile")
-plot_cli_profile(nc4, 212, "AM4 CLI profile")
+plot_cli_profile(nc3, 121, "AM3 CLI profile")
+plot_cli_profile(nc4, 122, "AM4 CLI profile")
+
+fig.tight_layout()
 
 plt.show()

@@ -1,14 +1,18 @@
 import matplotlib as mpl
 from netCDF4 import Dataset
-import ncdump
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import cartopy.crs as ccrs
 import numpy as np
 
+import ncdump
+import adjustfont
+
 # color/norm config
 cmap = mpl.cm.rainbow
 # norm = mpl.colors.Normalize(vmin=lo_cli, vmax = hi_cli)
+
+adjustfont.adjfont()
 
 # these values are overridden later
 norm = mpl.colors.Normalize(vmin=8.3e-7, vmax = 3.2e-5)
@@ -19,6 +23,7 @@ norm = mpl.colors.Normalize(vmin=8.3e-7, vmax = 3.2e-5)
 
 # plot config
 fig = plt.figure()
+
 
 # because plevs aren't exact, find closest to each target
 def find_closest_plev(target, plev):
@@ -60,13 +65,21 @@ def plot_lat_lon(dataset, splt_param, title, target_plev):
     ax.set_title(title)
     ax.set_xlabel("longitude")
     ax.set_ylabel("latitude")
+    
 
     ind = find_closest_plev(target_plev, plev)
     #disp = ax.pcolormesh(lon, lat, cli[ind], cmap=cmap, norm=norm, vmin=lo_cli, vmax=hi_cli)
 
+    """
+    # unified scale
     disp = ax.contourf(lon, lat, cli[ind], cmap=cmap, norm=norm, levels=8,\
             vmin = lo_cli, vmax = hi_cli)
-    #cbar = plt.colorbar(disp, ax=ax, format='%.0e')
+    """
+    # per-map scale
+    disp = ax.contourf(lon, lat, cli[ind], cmap=cmap, levels=8)
+
+    cbar = plt.colorbar(disp, ax=ax, format='%.0e')
+    cbar.set_label("cli (kg/kg)")
     return disp 
 
 
@@ -90,14 +103,14 @@ plot_lat_lon(am4, 322, "am4 150 plev", 150)
 plot_lat_lon(am4, 324, "am4 600 plev", 600)
 plot_lat_lon(am4, 326, "am5 900 plev", 900)
 
+"""
+1 Bar for all plots
 fig.subplots_adjust(right=0.8)
 cbar_ax = fig.add_axes([0.85, 0.15, 0.05, 0.7])
 cbar = plt.colorbar(plot_for_cb, cax=cbar_ax)
 cbar.set_label("cli (kg/kg)")
+"""
 
+
+fig.tight_layout
 plt.show()
-
-am3.close()
-am4.close()
-
-# lons = nc3.variables[][:]
